@@ -18,20 +18,38 @@
     </form>
 
     <div
-      v-for="(actorResult, index) in actorResults"
-      :key="index"
+      v-for="actor in actorResults"
+      :key="actor.id"
     >
-      {{ index }}: {{ actorResult }}
+      <actor-search-result
+        :actor="actor"
+        :images-configuration="imagesConfiguration"
+      />
     </div>
+
+    <!-- <div
+      v-for="(actor, index) in actorResults"
+      :key="actor.id"
+    >
+      {{ index }}: {{ actor }}
+    </div> -->
   </div>
 </template>
 
 <script lang="ts">
 import axios from 'axios';
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-@Component
-export default class App extends Vue {
+import ActorSearchResult from './ActorSearchResult.vue';
+
+@Component({
+  components: {
+    ActorSearchResult,
+  }
+})
+export default class ActorSearch extends Vue {
+  @Prop({ required: true }) readonly imagesConfiguration!: any;
+
   searchQuery = '';
 
   // TODO - create Actor interface
@@ -48,7 +66,7 @@ export default class App extends Vue {
           'language': 'en-US',
           'page': 1,
           'include_adult': false, // keeping things SFW
-        }
+        },
       });
 
       this.actorResults = response.data.results;
