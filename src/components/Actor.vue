@@ -1,11 +1,11 @@
 <template>
-  <div class="flex items-center border border-black mb-2 p-2 cursor-pointer">
+  <div class="flex items-center border border-black mb-4 p-4">
     <div
-      :style="{ 'background-image': `url(${imageUrl})` }"
-      class="w-16 h-16 bg-no-repeat bg-center"
+      :style="{ 'background-image': `url(${profileImageUrl})` }"
+      class="w-32 h-32 bg-no-repeat bg-center"
     />
 
-    <h5>{{ actor.name }}</h5>
+    <h4>{{ actor.name }}</h4>
   </div>
 </template>
 
@@ -20,8 +20,8 @@ export default class ActorSearchResult extends Vue {
   @Prop({ required: true }) readonly actor!: any;
   @Prop({ required: true }) readonly imageService!: ImageService;
 
-  get imageUrl() {
-    return this.imageService.thumbnailImageUrl(this.actor.profile_path);
+  get profileImageUrl() {
+    return this.imageService.profileImageUrl(this.actor.profile_path);
   }
 }
 </script>

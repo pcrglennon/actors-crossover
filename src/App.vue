@@ -2,10 +2,29 @@
   <div id="app" class="container mx-auto mt-32">
     <h1>Actors Crossover</h1>
 
-    <div class="flex">
+    <div v-if="isLoading">
+      <h3>Loading...</h3>
+    </div>
+
+    <div v-else>
+      <h3>Select one or more actors</h3>
+
       <actor-search
-        :images-configuration="imagesConfiguration"
+        :image-service="imageService"
+        @addActor="addActor"
       />
+
+      <ul>
+        <li
+          v-for="actor in actors"
+          :key="actor.id"
+        >
+          <actor
+            :actor="actor"
+            :image-service="imageService"
+          />
+        </li>
+      </ul>
     </div>
 
     <div class="flex justify-center border-t-2 border-black mt-32 py-12">
@@ -20,18 +39,25 @@
 import axios from 'axios';
 import { Component, Vue } from 'vue-property-decorator';
 
+import Actor from './components/Actor.vue';
 import ActorSearch from './components/ActorSearch.vue';
+import ImageService from './services/image_service';
 
 @Component({
   components: {
+    Actor,
     ActorSearch,
   },
 })
 export default class App extends Vue {
+  isLoading = true;
   // TODO - create Actor interface
-  actors = [];
+  actors: Array<any> = [];
+  imageService: ImageService | null = null;
 
-  imagesConfiguration = {};
+  addActor(actor: any) {
+    this.actors.push(actor);
+  }
 
   async created() {
     const response = await axios.get('https://api.themoviedb.org/3/configuration', {
@@ -40,7 +66,8 @@ export default class App extends Vue {
       },
     });
 
-    this.imagesConfiguration = response.data.images;
+    this.imageService = new ImageService(response.data.images);
+    this.isLoading = false;
   }
 }
 </script>

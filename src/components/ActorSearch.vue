@@ -23,16 +23,10 @@
     >
       <actor-search-result
         :actor="actor"
-        :images-configuration="imagesConfiguration"
+        :image-service="imageService"
+        @click.native="clickActor(actor)"
       />
     </div>
-
-    <!-- <div
-      v-for="(actor, index) in actorResults"
-      :key="actor.id"
-    >
-      {{ index }}: {{ actor }}
-    </div> -->
   </div>
 </template>
 
@@ -41,6 +35,7 @@ import axios from 'axios';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import ActorSearchResult from './ActorSearchResult.vue';
+import ImageService from '../services/image_service';
 
 @Component({
   components: {
@@ -48,12 +43,16 @@ import ActorSearchResult from './ActorSearchResult.vue';
   }
 })
 export default class ActorSearch extends Vue {
-  @Prop({ required: true }) readonly imagesConfiguration!: any;
+  @Prop({ required: true }) readonly imageService!: ImageService;
 
   searchQuery = '';
-
   // TODO - create Actor interface
   actorResults = [];
+
+  clickActor(actor: any) {
+    this.$emit('addActor', actor);
+    this.actorResults = [];
+  }
 
   async doSearch() {
     try {
