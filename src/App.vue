@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="container mx-auto mt-32">
-    <h1>Actors Crossover</h1>
+    <h1>Actor Movie Crossovers</h1>
 
     <div v-if="isLoading">
       <h3>Loading...</h3>
@@ -9,22 +9,50 @@
     <div v-else>
       <h3>Select one or more actors</h3>
 
-      <actor-search
-        :image-service="imageService"
-        @addActor="addActor"
-      />
-
-      <ul>
-        <li
-          v-for="actor in actors"
-          :key="actor.id"
-        >
-          <actor
-            :actor="actor"
+      <div class="flex items-start justify-start">
+        <div class="w-1/2">
+          <actor-search
             :image-service="imageService"
+            @addActor="addActor"
           />
-        </li>
-      </ul>
+
+          <ul v-if="actors.length">
+            <li
+              v-for="actor in actors"
+              :key="actor.id"
+            >
+              <actor
+                :actor="actor"
+                :image-service="imageService"
+              />
+            </li>
+          </ul>
+        </div>
+
+        <div class="w-1/2">
+          <button
+            class="ml-2 p-4 text-lg"
+            :class="buttonClasses"
+            :disabled="buttonDisabled"
+            @click="findMovieCrossovers"
+          >
+            Find Movie Crossovers
+          </button>
+
+          <div v-if="crossoverSearchStatus === 'in-progress'">
+            <p>LOADING</p>
+          </div>
+
+          <ul v-if="crossoverResults.length">
+            <li
+              v-for="crossoverResult in crossoverResults"
+              :key="crossoverResult.id"
+            >
+              {{ crossoverResult }}
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div class="flex justify-center border-t-2 border-black mt-32 py-12">
@@ -51,14 +79,80 @@ import ImageService from './services/image_service';
 })
 export default class App extends Vue {
   isLoading = true;
+
   // TODO - create Actor interface
   actors: Array<any> = [];
   imageService: ImageService | null = null;
+
+  crossoverSearchStatus = 'ready';
+  // TODO - create Movie/TV interface (?)
+  crossoverResults: any[] =  [];
+
+  get buttonDisabled() {
+    return this.actors.length <= 1;
+  }
+
+  get buttonClasses() {
+    return {
+      'bg-green-300': !this.buttonDisabled,
+      'bg-gray-300 cursor-not-allowed': this.buttonDisabled,
+    };
+  }
 
   addActor(actor: any) {
     this.actors.push(actor);
   }
 
+  // TODO (future) - figure out TV shows as well
+  async findMovieCrossovers() {
+    try {
+      this.crossoverSearchStatus = 'in-progress';
+
+      const requests = this.actors.map((actor: any) => {
+        return axios.get(`https://api.themoviedb.org/3/person/${actor.id}/movie_credits`, {
+          params: {
+            'api_key': process.env.VUE_APP_TMDB_API_KEY,
+            'language': 'en-US',
+          },
+        });
+      });
+
+      const responses = await axios.all(requests);
+
+      // TODO - just redo everything here, wtf
+
+      const moviesIdMap: { [id: number]: any[] } = {};
+
+      responses.forEach((response: any) => {
+        const castCredits = response.data.cast;
+        castCredits.forEach((castCredit: any) => {
+          const movieId: number = castCredit.id;
+          if (moviesIdMap[movieId]) {
+            moviesIdMap[movieId].push(castCredit);
+          } else {
+            moviesIdMap[movieId] = [castCredit];
+          }
+        });
+      });
+
+      const crossoverMovieIds = Object.keys(moviesIdMap).filter((stringKey: string) => {
+        return moviesIdMap[Number(stringKey)].length > 1;
+      });
+
+      crossoverMovieIds.forEach((movieIdString: string) => {
+        const movieCredits = moviesIdMap[Number(movieIdString)];
+        this.crossoverResults.push(movieCredits);
+      });
+
+
+    } catch(error) {
+      this.crossoverSearchStatus = 'error';
+      console.log('error fetching actor data');
+      console.log(error);
+    }
+  }
+
+  // lifecycle hooks
   async created() {
     const response = await axios.get('https://api.themoviedb.org/3/configuration', {
       params: {
