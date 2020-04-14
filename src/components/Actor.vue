@@ -15,7 +15,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import ImageService from '../services/image_service';
 
 @Component
-export default class ActorSearchResult extends Vue {
+export default class Actor extends Vue {
   // TODO - create Actor interface
   @Prop({ required: true }) readonly actor!: any;
   @Prop({ required: true }) readonly imageService!: ImageService;

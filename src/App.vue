@@ -43,12 +43,15 @@
             <p>LOADING</p>
           </div>
 
-          <ul v-if="crossoverResults.length">
+          <ul v-if="crossoverMovies.length">
             <li
-              v-for="crossoverResult in crossoverResults"
-              :key="crossoverResult.id"
+              v-for="movie in crossoverMovies"
+              :key="movie.id"
             >
-              {{ crossoverResult }}
+              <movie
+                :movie="movie"
+                :image-service="imageService"
+              />
             </li>
           </ul>
         </div>
@@ -69,12 +72,14 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import Actor from './components/Actor.vue';
 import ActorSearch from './components/ActorSearch.vue';
+import Movie from './components/Movie.vue';
 import ImageService from './services/image_service';
 
 @Component({
   components: {
     Actor,
     ActorSearch,
+    Movie,
   },
 })
 export default class App extends Vue {
@@ -85,11 +90,10 @@ export default class App extends Vue {
   imageService: ImageService | null = null;
 
   crossoverSearchStatus = 'ready';
-  // TODO - create Movie/TV interface (?)
-  crossoverResults: any[] =  [];
+  crossoverMovies: any[] =  [];
 
   get buttonDisabled() {
-    return this.actors.length <= 1;
+    return this.actors.length <= 1 || this.crossoverSearchStatus === 'in-progress';
   }
 
   get buttonClasses() {
@@ -106,6 +110,7 @@ export default class App extends Vue {
   // TODO (future) - figure out TV shows as well
   async findMovieCrossovers() {
     try {
+      this.crossoverMovies = [];
       this.crossoverSearchStatus = 'in-progress';
 
       const requests = this.actors.map((actor: any) => {
@@ -119,32 +124,9 @@ export default class App extends Vue {
 
       const responses = await axios.all(requests);
 
-      // TODO - just redo everything here, wtf
+      this.processCredits(responses);
 
-      const moviesIdMap: { [id: number]: any[] } = {};
-
-      responses.forEach((response: any) => {
-        const castCredits = response.data.cast;
-        castCredits.forEach((castCredit: any) => {
-          const movieId: number = castCredit.id;
-          if (moviesIdMap[movieId]) {
-            moviesIdMap[movieId].push(castCredit);
-          } else {
-            moviesIdMap[movieId] = [castCredit];
-          }
-        });
-      });
-
-      const crossoverMovieIds = Object.keys(moviesIdMap).filter((stringKey: string) => {
-        return moviesIdMap[Number(stringKey)].length > 1;
-      });
-
-      crossoverMovieIds.forEach((movieIdString: string) => {
-        const movieCredits = moviesIdMap[Number(movieIdString)];
-        this.crossoverResults.push(movieCredits);
-      });
-
-
+      this.crossoverSearchStatus = 'success';
     } catch(error) {
       this.crossoverSearchStatus = 'error';
       console.log('error fetching actor data');
@@ -162,6 +144,47 @@ export default class App extends Vue {
 
     this.imageService = new ImageService(response.data.images);
     this.isLoading = false;
+  }
+
+  // TODO - split this big mess out somewhere, somehow
+  private processCredits(responses: any[]) {
+    const moviesIdMap: { [id: number]: { actorCredits: any[]; id: number; title: string; releaseDate: string; posterPath: string } } = {};
+
+    const actorIdRegex = /https:\/\/api\.themoviedb\.org\/3\/person\/(\d+)\/movie_credits/;
+
+    responses.forEach((response: any) => {
+      // TODO - find a better way to pair up the Actor ID to the response
+      const actorId = Number(response.config.url.match(actorIdRegex)[1]);
+      const actor = this.actors.find(actor => actor.id === actorId);
+
+      const castCredits = response.data.cast;
+      castCredits.forEach((castCredit: any) => {
+        const movieId: number = castCredit.id;
+        const actorCredit = { id: castCredit.credit_id, actorName: actor.name, characterName: castCredit.character };
+
+        if (moviesIdMap[movieId]) {
+          moviesIdMap[movieId].actorCredits.push(actorCredit);
+        } else { // initialize movie
+          const { title, release_date, poster_path } = castCredit;
+          moviesIdMap[movieId] = {
+            id: movieId,
+            title: title,
+            releaseDate: release_date,
+            posterPath: poster_path,
+            actorCredits: [actorCredit]
+          };
+        }
+      });
+    });
+
+    const crossoverMovieIds = Object.keys(moviesIdMap).filter((stringKey: string) => {
+      return moviesIdMap[Number(stringKey)].actorCredits.length > 1;
+    });
+
+    crossoverMovieIds.forEach((movieIdString: string) => {
+      const movie = moviesIdMap[Number(movieIdString)];
+      this.crossoverMovies.push(movie);
+    });
   }
 }
 </script>
