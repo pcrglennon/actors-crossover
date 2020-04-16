@@ -6,6 +6,13 @@
     />
 
     <h4>{{ actor.name }}</h4>
+
+    <button
+      class="ml-auto p-4 text-lg text-red-600"
+      @click="removeActor(actor)"
+    >
+      X
+    </button>
   </div>
 </template>
 
@@ -19,6 +26,10 @@ export default class Actor extends Vue {
   // TODO - create Actor interface
   @Prop({ required: true }) readonly actor!: any;
   @Prop({ required: true }) readonly imageService!: ImageService;
+
+  removeActor(actor: any) {
+    this.$emit('removeActor', actor);
+  }
 
   get profileImageUrl() {
     return this.imageService.profileImageUrl(this.actor.profile_path);

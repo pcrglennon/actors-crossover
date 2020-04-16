@@ -24,6 +24,7 @@
               <actor
                 :actor="actor"
                 :image-service="imageService"
+                @removeActor="removeActor"
               />
             </li>
           </ul>
@@ -107,6 +108,11 @@ export default class App extends Vue {
 
   addActor(actor: any) {
     this.actors.push(actor);
+  }
+
+  removeActor(actor: any) {
+    const index = this.actors.indexOf(actor);
+    this.actors.splice(index, 1);
   }
 
   // TODO (future) - figure out TV shows as well
