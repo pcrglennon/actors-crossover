@@ -4,7 +4,7 @@
       v-model="searchQuery"
       placeholder="Enter Actor name"
       class="w-1/2 border border-black mr-6 p-2"
-      @keydown="doSearch"
+      @keyup="doSearch"
     >
 
     <div v-if="searchStatus === 'in-progress'">
@@ -67,12 +67,10 @@ export default class ActorSearch extends Vue {
       }
 
       this.searchStatus = 'in-progress';
-      // NB - API key value is still discoverable via source code & watching network requests.
-      // Move logic to a new server-side app if needed.
-      const response = await axios.get('https://api.themoviedb.org/3/search/person', {
+
+      const response = await axios.get(`${process.env.VUE_APP_API_URL_BASE}/movie-db-utils/tmdb-api-proxy/search/person`, {
         params: {
           'query': this.searchQuery,
-          'api_key': process.env.VUE_APP_TMDB_API_KEY,
           'language': 'en-US',
           'page': 1,
           'include_adult': false, // keeping things SFW

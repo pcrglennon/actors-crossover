@@ -144,6 +144,7 @@ export default class App extends Vue {
 
   // lifecycle hooks
   async created() {
+    // TODO - move image-URL building logic to backend, remove final direct dependency on TMDB API
     const response = await axios.get('https://api.themoviedb.org/3/configuration', {
       params: {
         'api_key': process.env.VUE_APP_TMDB_API_KEY,
