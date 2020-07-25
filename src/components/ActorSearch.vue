@@ -18,7 +18,6 @@
       >
         <actor-search-result
           :actor="actor"
-          :image-service="imageService"
           @click.native="clickActor(actor)"
         />
       </div>
@@ -35,7 +34,6 @@ import axios from 'axios';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import ActorSearchResult from './ActorSearchResult.vue';
-import ImageService from '../services/image_service';
 
 @Component({
   components: {
@@ -43,8 +41,6 @@ import ImageService from '../services/image_service';
   },
 })
 export default class ActorSearch extends Vue {
-  @Prop({ required: true }) readonly imageService!: ImageService;
-
   searchQuery = '';
   searchStatus = 'ready';
   // TODO - create Actor interface

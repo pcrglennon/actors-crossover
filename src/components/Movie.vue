@@ -37,7 +37,8 @@ import ImageService from '../services/image_service';
 export default class Movie extends Vue {
   // TODO - create Movie interface
   @Prop({ required: true }) readonly movie!: any;
-  @Prop({ required: true }) readonly imageService!: ImageService;
+
+  imageService = new ImageService();
 
   get posterImageUrl() {
     return this.imageService.profileImageUrl(this.movie.poster_path);

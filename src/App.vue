@@ -2,17 +2,12 @@
   <div id="app" class="container mx-auto mt-32">
     <h1>Actor Movie Crossovers</h1>
 
-    <div v-if="isLoading">
-      <h3>Loading...</h3>
-    </div>
-
-    <div v-else>
+    <div>
       <h3>Select one or more actors</h3>
 
       <div class="flex items-start justify-start">
         <div class="w-1/2">
           <actor-search
-            :image-service="imageService"
             @addActor="addActor"
           />
 
@@ -23,7 +18,6 @@
             >
               <actor
                 :actor="actor"
-                :image-service="imageService"
                 @removeActor="removeActor"
               />
             </li>
@@ -51,7 +45,6 @@
             >
               <movie
                 :movie="movie"
-                :image-service="imageService"
               />
             </li>
           </ul>
@@ -75,8 +68,6 @@ import Actor from './components/Actor.vue';
 import ActorSearch from './components/ActorSearch.vue';
 import Movie from './components/Movie.vue';
 
-import ImageService from './services/image_service';
-
 @Component({
   components: {
     Actor,
@@ -85,11 +76,8 @@ import ImageService from './services/image_service';
   },
 })
 export default class App extends Vue {
-  isLoading = true;
-
   // TODO - create Actor interface
   actors: Array<any> = [];
-  imageService: ImageService | null = null;
 
   crossoverSearchStatus = 'ready';
   crossoverMovies: any[] =  [];
@@ -134,19 +122,6 @@ export default class App extends Vue {
       console.log('error fetching actor data');
       console.log(error);
     }
-  }
-
-  // lifecycle hooks
-  async created() {
-    // TODO - move image-URL building logic to backend, remove final direct dependency on TMDB API
-    const response = await axios.get('https://api.themoviedb.org/3/configuration', {
-      params: {
-        'api_key': process.env.VUE_APP_TMDB_API_KEY,
-      },
-    });
-
-    this.imageService = new ImageService(response.data.images);
-    this.isLoading = false;
   }
 }
 </script>

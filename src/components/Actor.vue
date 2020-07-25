@@ -25,7 +25,8 @@ import ImageService from '../services/image_service';
 export default class Actor extends Vue {
   // TODO - create Actor interface
   @Prop({ required: true }) readonly actor!: any;
-  @Prop({ required: true }) readonly imageService!: ImageService;
+
+  imageService = new ImageService();
 
   removeActor(actor: any) {
     this.$emit('removeActor', actor);

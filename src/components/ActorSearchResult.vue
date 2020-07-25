@@ -18,7 +18,8 @@ import ImageService from '../services/image_service';
 export default class ActorSearchResult extends Vue {
   // TODO - create Actor interface
   @Prop({ required: true }) readonly actor!: any;
-  @Prop({ required: true }) readonly imageService!: ImageService;
+
+  imageService = new ImageService();
 
   get imageUrl() {
     return this.imageService.thumbnailImageUrl(this.actor.profile_path);
