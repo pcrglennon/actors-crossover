@@ -75,7 +75,6 @@ import Actor from './components/Actor.vue';
 import ActorSearch from './components/ActorSearch.vue';
 import Movie from './components/Movie.vue';
 
-import CrossoverMoviesService from './services/crossover_movies_service';
 import ImageService from './services/image_service';
 
 @Component({
@@ -121,19 +120,14 @@ export default class App extends Vue {
       this.crossoverMovies = [];
       this.crossoverSearchStatus = 'in-progress';
 
-      const requests = this.actors.map((actor: any) => {
-        return axios.get(`https://api.themoviedb.org/3/person/${actor.id}/movie_credits`, {
-          params: {
-            'api_key': process.env.VUE_APP_TMDB_API_KEY,
-            'language': 'en-US',
-          },
-        });
+      const actorIdsString = this.actors.map(actor => actor.id).join(',');
+      const response = await axios.get(`${process.env.VUE_APP_API_URL_BASE}/movie-db-utils/actors-crossover`, {
+        params: {
+          'actor_ids': actorIdsString,
+        }
       });
 
-      const responses = await axios.all(requests);
-      const crossoverMovies = new CrossoverMoviesService(responses, this.actors).getMovies();
-
-      this.crossoverMovies = crossoverMovies;
+      this.crossoverMovies = response.data.crossover_movies;
       this.crossoverSearchStatus = 'success';
     } catch(error) {
       this.crossoverSearchStatus = 'error';

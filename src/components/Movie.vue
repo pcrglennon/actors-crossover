@@ -12,15 +12,15 @@
         </h4>
 
         <h6 class="mb-2">
-          Release date: {{ movie.releaseDate }}
+          Release date: {{ movie.release_date }}
         </h6>
 
         <ul>
           <li
-            v-for="actorCredit in movie.actorCredits"
-            :key="actorCredit.id"
+            v-for="actorCredit in movie.actor_credits"
+            :key="actorCredit.actor_id"
           >
-            {{ actorCredit.actorName }}: {{ actorCredit.characterName }}
+            {{ actorCredit.actor_name }}: {{ actorCredit.character }}
           </li>
         </ul>
       </div>
@@ -40,7 +40,7 @@ export default class Movie extends Vue {
   @Prop({ required: true }) readonly imageService!: ImageService;
 
   get posterImageUrl() {
-    return this.imageService.profileImageUrl(this.movie.posterPath);
+    return this.imageService.profileImageUrl(this.movie.poster_path);
   }
 }
 </script>
