@@ -7,10 +7,10 @@ type MovieWithCredits = Omit<CrossoverMovie, 'crossoverCredits'> & {
 };
 
 interface IProps {
-  movies: MovieWithCredits[]
+  movies: MovieWithCredits[];
 }
 
-export function CrossoverMovies(props: IProps) {
+export const CrossoverMovies = ({ movies }: IProps) => {
   function formatMovie(movie: MovieWithCredits) {
     const credits = movie.crossoverCredits.map(credit => {
       return `Actor ID: ${credit.actorId}, Character Name: ${credit.characterName}`;
@@ -21,7 +21,7 @@ export function CrossoverMovies(props: IProps) {
 
   return (
     <ul>
-      {props.movies.map(movie => (
+      {movies.map(movie => (
         <li key={movie.id}>
           {formatMovie(movie)}
         </li>

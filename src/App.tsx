@@ -1,3 +1,4 @@
+import { Button, Col, Layout, Row, Space } from 'antd';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react';
 import React, { useState } from 'react';
@@ -13,7 +14,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-function App() {
+const App = () => {
   const [selectedActors, setSelectedActors] = useState<ActorSearchResult[]>([]);
 
   const [getCrossoverMovies, { loading, error, data }] = useCrossoverMoviesLazyQuery({
@@ -33,53 +34,72 @@ function App() {
 
   return (
     <ApolloProvider client={client}>
-      <div className="app">
-        <h1>Actors-Crossover</h1>
+      <Layout>
+        <Layout.Header>
+          <h1 style={{ margin: 0, color: 'white' }}>
+            Actors-Crossover
+          </h1>
+        </Layout.Header>
 
-        <div className="container">
-          <div className="search">
-            <h3>Select one or more actors</h3>
+        <Layout.Content style={{ padding: '40px 50px' }}>
+          <Row gutter={16}>
+            <Col xs={24} md={12}>
+              <div className="search">
+                <h3>Select one or more actors</h3>
 
-            <ActorSearch
-              onActorSelect={onActorSelect}
-            />
+                <ActorSearch
+                  onActorSelect={onActorSelect}
+                />
 
-            <ul>
-              {selectedActors.map(actorSearchResult => (
-                <li key={actorSearchResult.id}>
-                  {actorSearchResult.name} (ID: {actorSearchResult.id})
-                </li>
-              ))}
-            </ul>
-          </div>
+                <ul>
+                  {selectedActors.map(actorSearchResult => (
+                    <li key={actorSearchResult.id}>
+                      {actorSearchResult.name} (ID: {actorSearchResult.id})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Col>
 
-          <div className="results">
-            <button
-              disabled={selectedActors.length <= 1}
-              onClick={() => getCrossoverMovies({ variables: { actorIds: selectedActorIds() } })}
-            >
-              Find Movies
-            </button>
+            <Col xs={24} md={12}>
+              <div className="results">
+                <Button
+                  type="primary"
+                  disabled={selectedActors.length <= 1}
+                  loading={loading}
+                  onClick={() => getCrossoverMovies({ variables: { actorIds: selectedActorIds() } })}
+                >
+                  Find Movies
+                </Button>
 
-            {loading && (<p>loading...</p>)}
+                {loading && (<p>loading...</p>)}
 
-            {error && (<p>error: {error}</p>)}
+                {error && (<p>error: {error}</p>)}
 
-            {data?.crossoverMovies && (
-              <CrossoverMovies
-                movies={data.crossoverMovies}
+                {data?.crossoverMovies && (
+                  <CrossoverMovies
+                    movies={data.crossoverMovies}
+                  />
+                )}
+              </div>
+            </Col>
+          </Row>
+        </Layout.Content>
+
+        <Layout.Footer style={{ textAlign: 'center' }}>
+          <Space direction="vertical">
+            <h4>Powered by The Movie Database API</h4>
+
+            <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer">
+              <img
+                alt="Powered by The Movie DB"
+                src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg"
+                style={{ width: '240px', height: 'auto' }}
               />
-            )}
-          </div>
-        </div>
-
-        <div className="tmdb-api-link">
-          <h4>Powered by The Movie Database API</h4>
-          <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer">
-            <img alt="Powered by The Movie DB" src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg" />
-         </a>
-        </div>
-      </div>
+            </a>
+          </Space>
+         </Layout.Footer>
+      </Layout>
     </ApolloProvider>
   );
 }
