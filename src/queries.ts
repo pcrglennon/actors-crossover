@@ -20,6 +20,8 @@ export const CROSSOVER_MOVIES = gql`
     crossoverMovies(actorIds: $actorIds) {
       id
       title
+      releaseDate
+      posterPath
       crossoverCredits {
         actorId
         characterName

@@ -1,31 +1,23 @@
+import { Space } from 'antd';
 import React from 'react';
 
-import { CrossoverMovie, MovieCastCredit } from '../../generated/graphql';
-
-type MovieWithCredits = Omit<CrossoverMovie, 'crossoverCredits'> & {
-  crossoverCredits: Array<Pick<MovieCastCredit, 'actorId' | 'characterName'>>
-};
+import { MovieWithCredits } from './typings';
+import { CrossoverMovie } from './crossover-movie';
 
 interface IProps {
   movies: MovieWithCredits[];
 }
 
 export const CrossoverMovies = ({ movies }: IProps) => {
-  function formatMovie(movie: MovieWithCredits) {
-    const credits = movie.crossoverCredits.map(credit => {
-      return `Actor ID: ${credit.actorId}, Character Name: ${credit.characterName}`;
-    });
-
-    return `Title: ${movie.title}, credits: ${credits}`;
-  }
-
   return (
     <ul>
-      {movies.map(movie => (
-        <li key={movie.id}>
-          {formatMovie(movie)}
-        </li>
-      ))}
+      <Space direction="vertical">
+        {movies.map(movie => (
+          <li key={movie.id}>
+            <CrossoverMovie movie={movie} />
+          </li>
+        ))}
+      </Space>
     </ul>
   );
 }

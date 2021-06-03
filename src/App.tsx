@@ -1,4 +1,5 @@
 import { Button, Col, Layout, Row, Space } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react';
 import React, { useState } from 'react';
@@ -28,6 +29,10 @@ const App = () => {
     ]);
   }
 
+  function removeActor(actorId: number) {
+    setSelectedActors(selectedActors.filter(actor => actor.id !== actorId));
+  }
+
   function selectedActorIds() {
     return selectedActors.map(({ id }) => id);
   }
@@ -49,12 +54,21 @@ const App = () => {
 
                 <ActorSearch
                   onActorSelect={onActorSelect}
+                  selectedActorIds={selectedActorIds()}
                 />
 
                 <ul>
                   {selectedActors.map(actorSearchResult => (
                     <li key={actorSearchResult.id}>
                       {actorSearchResult.name} (ID: {actorSearchResult.id})
+
+                      <Button
+                        onClick={(_e) => { removeActor(actorSearchResult.id) }}
+                        icon={<CloseOutlined />}
+                        shape="circle"
+                        size="small"
+                        style={{ marginLeft: '10px' }}
+                      />
                     </li>
                   ))}
                 </ul>

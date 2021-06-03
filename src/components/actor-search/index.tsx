@@ -7,9 +7,10 @@ import './ActorSearch.css';
 
 interface IProps {
   onActorSelect: (result: ActorSearchResult) => void;
+  selectedActorIds: number[];
 }
 
-export const ActorSearch = ({ onActorSelect }: IProps) => {
+export const ActorSearch = ({ onActorSelect, selectedActorIds }: IProps) => {
   const [searchInput, setSearchInput] = useState('');
   const [options, setOptions] = useState<{ key: number, value: number, label: string }[]>([]);
 
@@ -20,7 +21,12 @@ export const ActorSearch = ({ onActorSelect }: IProps) => {
 
   useEffect(() => {
     if (data?.actorSearch.results) {
-      setOptions(data.actorSearch.results.map(actorSearchResult => {
+      // filter out any actors which are already selected
+      const filteredResults = data.actorSearch.results.filter(result => {
+        return !selectedActorIds.includes(result.id);
+      });
+
+      setOptions(filteredResults.map(actorSearchResult => {
         return {
           key: actorSearchResult.id,
           value: actorSearchResult.id,
@@ -28,7 +34,7 @@ export const ActorSearch = ({ onActorSelect }: IProps) => {
         };
       }));
     }
-  }, [data]);
+  }, [data, selectedActorIds]);
 
   function onSelect(value: number) {
     const actorSearchResult = data?.actorSearch.results.find(actorSearchResult => {
