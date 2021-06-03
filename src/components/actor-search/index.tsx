@@ -14,6 +14,7 @@ export const ActorSearch = ({ onActorSelect, selectedActorIds }: IProps) => {
   const [searchInput, setSearchInput] = useState('');
   const [options, setOptions] = useState<{ key: number, value: number, label: string }[]>([]);
 
+  // TODO - debounce/throttle search
   const { loading, data } = useActorSearchQuery({
     variables: { queryString: searchInput },
     skip: searchInput.length <= 2

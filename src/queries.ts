@@ -23,7 +23,9 @@ export const CROSSOVER_MOVIES = gql`
       releaseDate
       posterPath
       crossoverCredits {
+        id
         actorId
+        actorName
         characterName
       }
     }

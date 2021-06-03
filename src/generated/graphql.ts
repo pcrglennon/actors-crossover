@@ -53,8 +53,10 @@ export type CrossoverMovie = {
 
 export type MovieCastCredit = {
   __typename?: 'MovieCastCredit';
-  actorId: Scalars['Int'];
+  id: Scalars['String'];
   movieId: Scalars['Int'];
+  actorId: Scalars['Int'];
+  actorName: Scalars['String'];
   characterName: Scalars['String'];
 };
 
@@ -108,7 +110,7 @@ export type CrossoverMoviesQuery = (
     & Pick<CrossoverMovie, 'id' | 'title' | 'releaseDate' | 'posterPath'>
     & { crossoverCredits: Array<(
       { __typename?: 'MovieCastCredit' }
-      & Pick<MovieCastCredit, 'actorId' | 'characterName'>
+      & Pick<MovieCastCredit, 'id' | 'actorId' | 'actorName' | 'characterName'>
     )> }
   )> }
 );
@@ -164,7 +166,9 @@ export const CrossoverMoviesDocument = gql`
     releaseDate
     posterPath
     crossoverCredits {
+      id
       actorId
+      actorName
       characterName
     }
   }

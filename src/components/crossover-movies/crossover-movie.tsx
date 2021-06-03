@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { MovieWithCredits } from './typings';
+import { CrossoverMoviesQuery } from '../../generated/graphql';
 
 interface IProps {
-  movie: MovieWithCredits;
+  movie: CrossoverMoviesQuery['crossoverMovies'][0];
 }
 
 export const CrossoverMovie = ({ movie }: IProps) => {
@@ -17,7 +17,7 @@ export const CrossoverMovie = ({ movie }: IProps) => {
         {movie.crossoverCredits.map((credit, index) => {
           return (
             <li key={index}>
-              Actor ID: {credit.actorId}, Character: {credit.characterName}
+              {credit.actorName}: {credit.characterName}
             </li>
           );
         })}

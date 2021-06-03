@@ -60,7 +60,7 @@ const App = () => {
                 <ul>
                   {selectedActors.map(actorSearchResult => (
                     <li key={actorSearchResult.id}>
-                      {actorSearchResult.name} (ID: {actorSearchResult.id})
+                      {actorSearchResult.name}
 
                       <Button
                         onClick={(_e) => { removeActor(actorSearchResult.id) }}

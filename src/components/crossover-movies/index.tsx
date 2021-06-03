@@ -1,11 +1,11 @@
 import { Space } from 'antd';
 import React from 'react';
 
-import { MovieWithCredits } from './typings';
+import { CrossoverMoviesQuery } from '../../generated/graphql';
 import { CrossoverMovie } from './crossover-movie';
 
 interface IProps {
-  movies: MovieWithCredits[];
+  movies: CrossoverMoviesQuery['crossoverMovies'];
 }
 
 export const CrossoverMovies = ({ movies }: IProps) => {
